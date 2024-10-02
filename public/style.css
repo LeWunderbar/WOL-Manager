@@ -1,0 +1,13 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+  h1 {
+    margin-bottom: 20px;
+  }
+  #server-list {
+    margin-bottom: 20px;
+  }
+  #server-list div {
+    margin-bottom: 10px;
+  }

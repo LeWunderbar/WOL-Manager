@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wake On LAN</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Wake On LAN</h1>
+  <div id="server-list"></div>
+  <form id="new-server-form">
+    <h3>Add New Server</h3>
+    <input type="text" id="name" placeholder="Name" required />
+    <input type="text" id="ip" placeholder="IP Address" required />
+    <input type="text" id="mac" placeholder="MAC Address" required />
+    <label>
+      Auto Mode:
+      <input type="checkbox" id="autoMode">
+    </label>
+    <button type="submit">Add Server</button>
+  </form>
+  <script src="script.js"></script>
+</body>
+</html>
