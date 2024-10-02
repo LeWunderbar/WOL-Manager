@@ -73,6 +73,37 @@ app.post('/api/toggle/:index', (req, res) => {
   res.send('Auto mode toggled');
 });
 
+// API to remove a server
+app.delete('/api/servers/:index', (req, res) => {
+  const index = req.params.index;
+  if (index < 0 || index >= servers.length) {
+    return res.status(400).send('Invalid index');
+  }
+  servers.splice(index, 1);
+  fs.writeFileSync('./servers.json', JSON.stringify(servers, null, 2));
+  res.send('Server removed');
+});
+
+// API to check the status of a server
+app.get('/api/status/:index', async (req, res) => {
+  const index = req.params.index;
+  if (index < 0 || index >= servers.length) {
+    return res.status(400).send('Invalid index');
+  }
+
+  const server = servers[index];
+  try {
+    const response = await fetch(`http://${server.ip}`, { timeout: 5000 });
+    if (response.ok) {
+      res.send(`${server.name} is online`);
+    } else {
+      res.send(`${server.name} is offline`);
+    }
+  } catch (error) {
+    res.send(`${server.name} is offline`);
+  }
+});
+
 app.listen(3000, () => {
   console.log('Server running on port 3000');
 });

@@ -3,23 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wake On LAN</title>
-  <link rel="stylesheet" href="style.css">
+  <title>WOL Manager</title>
+  <script src="index.js" defer></script>
 </head>
 <body>
-  <h1>Wake On LAN</h1>
+  <h1>Wake On LAN Manager</h1>
   <div id="server-list"></div>
   <form id="new-server-form">
-    <h3>Add New Server</h3>
-    <input type="text" id="name" placeholder="Name" required />
-    <input type="text" id="ip" placeholder="IP Address" required />
-    <input type="text" id="mac" placeholder="MAC Address" required />
+    <input type="text" id="name" placeholder="Server Name" required>
+    <input type="text" id="ip" placeholder="Server IP" required>
+    <input type="text" id="mac" placeholder="MAC Address" required>
     <label>
-      Auto Mode:
-      <input type="checkbox" id="autoMode">
+      Auto Mode: <input type="checkbox" id="autoMode">
     </label>
     <button type="submit">Add Server</button>
   </form>
-  <script src="script.js"></script>
 </body>
 </html>
