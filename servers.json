@@ -1,14 +1,1 @@
-[
-  {
-    "name": "test",
-    "ip": "192.168.178.188",
-    "mac": "40:8d:5c:a5:5a:ea",
-    "autoMode": false
-  },
-  {
-    "name": "test2",
-    "ip": "192.168.178.154",
-    "mac": "40:8d:5c:a5:5a:ea",
-    "autoMode": false
-  }
-]
+[]

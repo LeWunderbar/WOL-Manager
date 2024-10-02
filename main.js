@@ -7,8 +7,18 @@ const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.json());
 app.use(express.static('public'));
-
 let servers = require('./servers.json');
+
+console.clear();
+console.log(`
+    ██╗      ██████╗ ██╗   ██╗    ███╗   ███╗██████╗ ██████╗
+    ╚██╗     ██╔══██╗╚██╗ ██╔╝    ████╗ ████║╚════██╗╚════██╗
+     ╚██╗    ██████╔╝ ╚████╔╝     ██╔████╔██║ █████╔╝ █████╔╝
+     ██╔╝    ██╔══██╗  ╚██╔╝      ██║╚██╔╝██║██╔═══╝  ╚═══██╗
+    ██╔╝     ██████╔╝   ██║       ██║ ╚═╝ ██║███████╗██████╔╝
+    ╚═╝      ╚═════╝    ╚═╝       ╚═╝     ╚═╝╚══════╝╚═════╝                                                
+`);
+console.log("WOL-Manager V1.0")
 
 // Check server status every 30 seconds and attempt wake-up if down
 setInterval(() => {
@@ -41,9 +51,24 @@ function attemptWake(server, retries) {
   });
 }
 
+async function checkServerStatus(ip) {
+  try {
+    const response = await fetch(`http://${ip}`, { timeout: 5000 });
+    return response.ok; // true if server is online
+  } catch {
+    return false; // false if server is down
+  }
+}
+
 // API to get servers
-app.get('/api/servers', (req, res) => {
-  res.json(servers);
+app.get('/api/servers', async (req, res) => {
+  const serverStatusPromises = servers.map(async (server, index) => {
+    const isOnline = await checkServerStatus(server.ip);
+    return { ...server, isOnline }; // Add online status to server object
+  });
+
+  const serversWithStatus = await Promise.all(serverStatusPromises);
+  res.json(serversWithStatus);
 });
 
 // API to add a new server
