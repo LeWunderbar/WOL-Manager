@@ -3,6 +3,7 @@ const fs = require('fs');
 const fetch = require('node-fetch');
 const wol = require('wake_on_lan');
 const bodyParser = require('body-parser');
+const ping = require('ping');
 
 const app = express();
 app.use(bodyParser.json());
@@ -115,17 +116,18 @@ app.get('/api/status/:index', async (req, res) => {
   if (index < 0 || index >= servers.length) {
     return res.status(400).send('Invalid index');
   }
-
+  
   const server = servers[index];
   try {
-    const response = await fetch(`http://${server.ip}`, { timeout: 5000 });
-    if (response.ok) {
+    const result = await ping.promise.probe(server.ip, { timeout: 5 });
+    
+    if (result.alive) {
       res.send(`${server.name} is online`);
     } else {
       res.send(`${server.name} is offline`);
     }
   } catch (error) {
-    res.send(`${server.name} is offline`);
+    res.status(500).send(`Error pinging ${server.name}: ${error.message}`);
   }
 });
 
