@@ -4,15 +4,14 @@ async function fetchServers() {
   const servers = await response.json();
   const serverList = document.getElementById('server-list');
   serverList.innerHTML = '';
-  
+
   servers.forEach((server, index) => {
     const serverDiv = document.createElement('div');
-    const dotColor = server.isOnline ? '#1db954' : '#9c0d0d'; // Determine dot color based on server status
-    const dotStyle = `width: 10px; height: 10px; border-radius: 50%; background-color: ${dotColor}; display: inline-block; margin-right: 10px; vertical-align: middle;`;
-    
+    const dotStyle = `width: 10px; height: 10px; border-radius: 50%; background-color: #9c0d0d; display: inline-block; margin-right: 10px; vertical-align: middle;`; // default dot color (offline)
+
     serverDiv.innerHTML = `
       <h3>
-        <span style="${dotStyle}"></span>${server.name} (${server.ip})
+        <span id="status-dot-${index}" style="${dotStyle}"></span>${server.name} (${server.ip})
       </h3>
       <label>
       <input type="checkbox" ${server.autoMode ? 'checked' : ''} onchange="toggleAutoMode(${index})">
@@ -23,7 +22,26 @@ async function fetchServers() {
     `;
     serverList.appendChild(serverDiv);
   });
+
+  // Fetch and update server statuses after rendering
+  updateServerStatuses();
 }
+
+async function updateServerStatuses() {
+  try {
+    const response = await fetch('/api/status');
+    const servers = await response.json();
+
+    servers.forEach((server, index) => {
+      const dot = document.getElementById(`status-dot-${index}`);
+      const dotColor = server.isOnline ? '#1db954' : '#9c0d0d'; // online is green, offline is red
+      dot.style.backgroundColor = dotColor;
+    });
+  } catch (error) {
+    console.error('Failed to fetch server statuses:', error);
+  }
+}
+
 
 // Notification Handler
 function showNotification(message, type) {
@@ -44,7 +62,7 @@ async function wakeServer(index) {
   try {
     const response = await fetch(`/api/wake/${index}`, { method: 'POST' });
     if (!response.ok) {
-      throw new Error('Failed to send wake packet.');
+      showNotification('Failed to send wake packet.', 'error');
     }
     showNotification('Wake packet sent successfully.', 'success');
   } catch (error) {
@@ -58,8 +76,9 @@ async function removeServer(index) {
     if (!response.ok) {
       throw new Error('Failed to remove server.');
     }
-    showNotification('Server removed successfully.', 'success');
+
     fetchServers();
+    showNotification('Server removed successfully.', 'success');
   } catch (error) {
     showNotification('Failed to remove server.', 'error');
   }
@@ -93,5 +112,6 @@ document.getElementById('new-server-form').addEventListener('submit', async (e) 
   }
 });
 
-// Fetch the list of servers when the page loads
-fetchServers();
+setInterval(() => {
+  fetchServers();
+}, 5000);

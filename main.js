@@ -30,18 +30,23 @@ setInterval(() => {
   });
 }, 30000);
 
-async function checkAndWake(server, index) {
+async function checkServerStatus(ip) {
   try {
-    const response = await fetch(`http://${server.ip}`, { timeout: 5000 });
-    if (!response.ok) throw new Error('Server down');
+    const result = await ping.promise.probe(ip, { timeout: 5 });
+
+    if (result.alive) {
+      return true
+    } else {
+      return false
+    }
   } catch (error) {
-    console.log(`${server.name} is down. Attempting to wake up...`);
-    attemptWake(server, 3);
+    console.warn("Error while pinging ", ip)
+    return false
   }
 }
 
 function attemptWake(server, retries) {
-  if (retries === 0) return;
+  if (retries === 0) return 0;
   wol.wake(server.mac, (err) => {
     if (err) {
       console.error(`Failed to wake ${server.name}:`, err);
@@ -52,25 +57,37 @@ function attemptWake(server, retries) {
   });
 }
 
-async function checkServerStatus(ip) {
+async function checkAndWake(server, index) {
   try {
-    const response = await fetch(`http://${ip}`, { timeout: 5000 });
-    return response.ok; // true if server is online
-  } catch {
-    return false; // false if server is down
+    let resultPing = await ping.promise.probe(server.ip, { timeout: 5 });
+    if (!resultPing) {
+      console.log("Server ", server.name, " (", server.ip, ") is DOWN! Trying to Wake...")
+      const resultWake = attemptWake(server, 3)
+      resultPing = await ping.promise.probe(server.ip, { timeout: 5 });
+
+      if (resultWake == 0) {
+        if (!resultPing) {
+          console.log("Server ", server.name, " (", server.ip, ") is DOWN! Failed to Wake!")
+        } else {
+          console.log("Server ", server.name, " (", server.ip, ") is UP!")
+        }
+      }
+    }
+
+  } catch (error) {
+    console.log(`${server.name} is down. Attempting to wake up...`);
+    attemptWake(server, 3);
   }
 }
 
 // API to get servers
 app.get('/api/servers', async (req, res) => {
-  const serverStatusPromises = servers.map(async (server, index) => {
-    const isOnline = await checkServerStatus(server.ip);
-    return { ...server, isOnline }; // Add online status to server object
+  const serversWithoutStatus = servers.map(server => {
+    return { ...server };
   });
-
-  const serversWithStatus = await Promise.all(serverStatusPromises);
-  res.json(serversWithStatus);
+  res.json(serversWithoutStatus);
 });
+
 
 // API to add a new server
 app.post('/api/servers', (req, res) => {
@@ -83,10 +100,13 @@ app.post('/api/servers', (req, res) => {
 // API to manually send WOL packet
 app.post('/api/wake/:index', (req, res) => {
   const server = servers[req.params.index];
+  console.log(server)
   wol.wake(server.mac, (err) => {
     if (err) {
+      console.log("Err")
       res.status(500).send('Failed to send WOL packet');
     } else {
+      console.log("Sent")
       res.send('Wake packet sent');
     }
   });
@@ -110,24 +130,28 @@ app.delete('/api/servers/:index', (req, res) => {
   res.send('Server removed');
 });
 
-// API to check the status of a server
-app.get('/api/status/:index', async (req, res) => {
-  const index = req.params.index;
-  if (index < 0 || index >= servers.length) {
-    return res.status(400).send('Invalid index');
-  }
-  
-  const server = servers[index];
-  try {
-    const result = await ping.promise.probe(server.ip, { timeout: 5 });
-    
-    if (result.alive) {
-      res.send(`${server.name} is online`);
-    } else {
-      res.send(`${server.name} is offline`);
+app.get('/api/status/:index?', async (req, res) => {
+  const { index } = req.params;
+
+  if (index === undefined) {
+    // No index provided, return status for all servers
+    const serverStatusPromises = servers.map(async (server) => {
+      const isOnline = await checkServerStatus(server.ip);
+      return { ...server, isOnline };
+    });
+
+    const allServersWithStatus = await Promise.all(serverStatusPromises);
+    res.json(allServersWithStatus);
+  } else {
+    // Index provided, return status for a specific server
+    const server = servers[index];
+
+    if (!server) {
+      return res.status(404).json({ error: 'Server not found' });
     }
-  } catch (error) {
-    res.status(500).send(`Error pinging ${server.name}: ${error.message}`);
+
+    const isOnline = await checkServerStatus(server.ip);
+    res.json({ ...server, isOnline });
   }
 });
 
