@@ -5,3 +5,4 @@ Storage/
 .envProd
 .env
 servers.json
+Dockerfile
