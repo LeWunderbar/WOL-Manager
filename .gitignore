@@ -4,3 +4,4 @@ Storage/
 .envDev
 .envProd
 .env
+servers.json

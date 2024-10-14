@@ -12,7 +12,8 @@ const ping = require('ping');
 const app = express();
 app.use(bodyParser.json());
 app.use(express.static('public'));
-let servers = require('./servers.json');
+const DatabasePath = "./servers.json"
+let servers = null
 const cCheckAutoModeInterval = 60 // In Sec
 const cWakingInterval = 30 // In Sec
 let WakingServersArray = []
@@ -190,6 +191,15 @@ console.log(`
 `);
 console.log("WOL-Manager V1.0")
 if (Debugging) {console.log("DEBUG: Debugging is Enabled!")}
+
+if (!fs.existsSync(DatabasePath)) {
+  const defaultContent = JSON.stringify([], null, 2);
+  fs.writeFileSync(DatabasePath, defaultContent, 'utf8')
+  if (Debugging) {console.log("DEBUG: servers.json created!")}
+} else {
+  if (Debugging) {console.log("DEBUG: servers.json already exists.")}
+}
+servers = require('./servers.json');
 
 // AutoMode Loop
 setInterval(() => {
