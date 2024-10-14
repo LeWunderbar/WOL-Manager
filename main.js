@@ -16,7 +16,7 @@ let servers = require('./servers.json');
 const cCheckAutoModeInterval = 60 // In Sec
 const cWakingInterval = 30 // In Sec
 let WakingServersArray = []
-const Debugging = true
+const Debugging = false
 
 // Functions //
 // Ping Function
@@ -94,9 +94,8 @@ app.delete('/api/servers/:index', (req, res) => {
 // API to get statuses of servers (Single and all)
 app.get('/api/status/:index?', async (req, res) => {
   const { index } = req.params;
-  if (Debugging) {console.log("DEBUG: API CALL: GET /api/status with data", index)}
-
   if (index === undefined) {
+    if (Debugging) {console.log("DEBUG: API CALL: GET /api/status with no data")}
     // No index provided, return status for all servers
     const serverStatusPromises = servers.map(async (server) => {
       const isOnline = await checkServerStatus(server.ip);
@@ -106,6 +105,7 @@ app.get('/api/status/:index?', async (req, res) => {
     const allServersWithStatus = await Promise.all(serverStatusPromises);
     res.json(allServersWithStatus);
   } else {
+    if (Debugging) {console.log("DEBUG: API CALL: GET /api/status with data", index)}
     // Index provided, return status for a specific server
     const server = servers[index];
 
