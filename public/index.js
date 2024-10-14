@@ -1,3 +1,9 @@
+// WOL-MANAGER | frontend | index.js
+
+// VARS //
+const cStatusUpdateInterval = 5 // In Sec
+
+// FUNCTIONS //
 // Fetch servers and display them
 async function fetchServers() {
   const response = await fetch('/api/servers');
@@ -22,11 +28,9 @@ async function fetchServers() {
     `;
     serverList.appendChild(serverDiv);
   });
-
-  // Fetch and update server statuses after rendering
-  updateServerStatuses();
 }
 
+// Get and update Statuses of servers
 async function updateServerStatuses() {
   try {
     const response = await fetch('/api/status');
@@ -58,6 +62,8 @@ function showNotification(message, type) {
   }, 3000); 
 }
 
+// API FUNCTIONS //
+// WakeServer API Call
 async function wakeServer(index) {
   try {
     const response = await fetch(`/api/wake/${index}`, { method: 'POST' });
@@ -70,11 +76,27 @@ async function wakeServer(index) {
   }
 }
 
+// Toggle Automode API Call
+async function toggleAutoMode(index) {
+  try {
+    const response = await fetch(`/api/toggle/${index}`, { method: 'POST' });
+    if (!response.ok) {
+      showNotification('Failed to toggle Automode.', 'error');
+    }
+    showNotification('Changed Automode successfully.', 'success');
+
+    fetchServers();
+  } catch (error) {
+    showNotification('Failed to toggle Automode.', 'error');
+  }
+}
+
+// Remove server API Call
 async function removeServer(index) {
   try {
     const response = await fetch(`/api/servers/${index}`, { method: 'DELETE' });
     if (!response.ok) {
-      throw new Error('Failed to remove server.');
+      showNotification('Failed to remove server.', 'error');
     }
 
     fetchServers();
@@ -84,7 +106,7 @@ async function removeServer(index) {
   }
 }
 
-// Add server Handler
+// Add New server Handler and API Call
 document.getElementById('new-server-form').addEventListener('submit', async (e) => {
   try {
     e.preventDefault();
@@ -106,12 +128,18 @@ document.getElementById('new-server-form').addEventListener('submit', async (e) 
     document.getElementById('autoMode').checked = false;
 
     fetchServers();
+    updateServerStatuses();
     showNotification('Server added successfully.', 'success');
   } catch (error) {
     showNotification('Failed to remove server.', 'error');
   }
 });
 
+// INIT //
+fetchServers();
+updateServerStatuses();
+
+// Update Statuses Loop
 setInterval(() => {
-  fetchServers();
-}, 5000);
+  updateServerStatuses();
+}, cStatusUpdateInterval * 1000);

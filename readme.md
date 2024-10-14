@@ -1,7 +1,3 @@
-BUG TO FIX:
-.188 Ping works and is UP
-.156 Ping not working, DOWN
-
 # WOL-Manager
 
 ## What is WOL-Manager?
