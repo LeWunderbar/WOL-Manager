@@ -1,17 +1,39 @@
-const http = require('http');
+const express = require('express');
+const fs = require('fs');
+const { exec } = require('child_process');
+const app = express();
+const port = 4021;
 
-// Define the hostname and port
-const hostname = '0.0.0.0'; // Allows access from any IP
-const port = 3000;
+const configPath = './config.json';
+let config;
 
-// Create an HTTP server
-const server = http.createServer((req, res) => {
-  res.statusCode = 200; // HTTP status code for success
-  res.setHeader('Content-Type', 'text/plain'); // Response type
-  res.end('Hello, your server is working!\n'); // Response message
+try {
+  const data = fs.readFileSync(configPath);
+  config = JSON.parse(data);
+} catch (err) {
+  console.error('Error reading config.json:', err);
+  process.exit(1);
+}
+
+app.use(express.json());
+
+app.post('/shutdown', (req, res) => {
+  const { token } = req.body;
+  if (token !== config.token) {
+    return res.status(403).json({ message: 'Forbidden: Invalid token' });
+  }
+
+  exec('shutdown now', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error shutting down: ${error}`);
+      return res.status(500).json({ message: 'Failed to shutdown the server' });
+    }
+
+    console.log('Server is shutting down...');
+    res.json({ message: 'Server is shutting down...' });
+  });
 });
 
-// Start the server
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+app.listen(port, () => {
+  console.log(`Shutdown server API listening at http://localhost:${port}`);
 });

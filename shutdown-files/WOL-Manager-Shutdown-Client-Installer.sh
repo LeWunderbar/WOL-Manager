@@ -6,6 +6,12 @@ INSTALL_DIR="/opt/shutdown-server"
 SERVICE_NAME="shutdown-server"
 REPO="https://raw.githubusercontent.com/LeWunderbar/WOL-Manager/shutdown-option/shutdown-files/shutdown-client.js"
 
+# Check if a token is provided
+if [ -z "$TOKEN" ]; then
+  echo "Error: No token provided. Usage: $0 your-token-here"
+  exit 1
+fi
+
 # Install Node.js
 if ! command -v node > /dev/null; then
   echo "Node.js not found. Installing the latest Node.js version..."
@@ -24,14 +30,14 @@ cd $INSTALL_DIR
 
 # Get file from github
 echo "Downloading shutdown-client.js from GitHub..."
-curl -o shutdownServer.js $REPO
+sudo curl -o shutdownServer.js $REPO
 
 # Write the config file
-cat > config.json <<EOL
+sudo bash -c "cat > config.json <<EOL
 {
-  "token": "$TOKEN"
+  \"token\": \"$TOKEN\"
 }
-EOL
+EOL"
 
 # Install npm dependencies
 npm init -y > /dev/null 2>&1
