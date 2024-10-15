@@ -8,6 +8,10 @@ WOL-Manager is a Node.js application that allows you to manage and monitor your 
 
 Automode is a feature that automatically checks the status of your servers at regular intervals. If a server is found to be offline, WOL-Manager will attempt to wake it up using the Wake-On-LAN protocol. You can enable or disable this feature for each server individually, providing you with flexibility in managing your server environment.
 
+### Shutdown Option
+
+By selecting this option, the user can install a script on the target server to enable shutdown control and monitoring. Please be aware that the script uses unsecured HTTP, and API tokens are stored in plain text. Proceed with caution as this may pose security risks.
+
 ## How to Access the Web GUI
 
 To access the WOL-Manager web GUI, follow these steps:
