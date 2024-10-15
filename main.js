@@ -46,36 +46,36 @@ app.post('/api/shutdown/:index', (req, res) => {
 	if (!server.allowShutdown) {
 		res.send("Shutdown not allowed for ", server.name);
 	} else {
-		const token = server.token
+		const token = server.token;
 		const options = {
 			hostname: server.ip,
 			port: 4021,
 			path: '/shutdown',
 			method: 'POST',
 			headers: {
-			  'Content-Type': 'text/plain',
-			  'Content-Length': Buffer.byteLength(JSON.stringify({ token }))
+				'Content-Type': 'application/json',
+				'Content-Length': Buffer.byteLength(JSON.stringify({ token: token }))
 			}
-		  };
+		};
 
 		// Create the request
 		const req = http.request(options, (res) => {
 			console.log(`STATUS: ${res.statusCode}`); // DEBUG
-				
+
 			res.setEncoding('utf8');
 			res.on('data', (chunk) => {
-			console.log(`BODY: ${chunk}`); // DEBUG
+				console.log(`BODY: ${chunk}`); // DEBUG
 			});
 		});
-			
+
 		// Handle errors
 		req.on('error', (error) => {
 			console.error(`Error: ${error.message}`); // DEBUG
 		});
-			
+
 		// Write the data to the request body
-		req.write(JSON.stringify({ token }));
-			
+		req.write(JSON.stringify({ token: token }));
+
 		// End the request
 		req.end();
 	}
