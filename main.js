@@ -13,7 +13,7 @@ const app = express()
 app.use(bodyParser.json())
 app.use(express.static("public"))
 
-const DatabasePath = "./servers.json"
+const DatabasePath = "./database/servers.json"
 let servers = null
 let WakingServersArray = []
 const cCheckAutoModeInterval = 60 // In Sec
@@ -105,7 +105,7 @@ app.post("/api/servers", (req, res) => {
   	const { name, ip, mac, autoMode, allowShutdown, token } = req.body
   	if (Debugging) {console.log("DEBUG: API CALL: POST /api/servers with data: ", name, " | ", ip, " | ", mac, " | ", autoMode, " | ", allowShutdown, " | ", token )}
   	servers.push({ name, ip, mac, autoMode, allowShutdown, token })
-  	fs.writeFileSync("./servers.json", JSON.stringify(servers, null, 2))
+  	fs.writeFileSync(DatabasePath, JSON.stringify(servers, null, 2))
   	res.status(201).send("Server added")
 })
 
@@ -129,7 +129,7 @@ app.post("/api/wake/:index", (req, res) => {
 app.post("/api/toggle/:index", (req, res) => {
   	servers[req.params.index].autoMode = !servers[req.params.index].autoMode
 	if (Debugging) {console.log("DEBUG: API CALL: POST /api/toggle with data: ", req.params.index)}
-  	fs.writeFileSync("./servers.json", JSON.stringify(servers, null, 2))
+  	fs.writeFileSync(DatabasePath, JSON.stringify(servers, null, 2))
   	res.send("Auto mode toggled")
 })
 
@@ -141,7 +141,7 @@ app.delete("/api/servers/:index", (req, res) => {
 		return res.status(400).send("Invalid index")
   	}
   	servers.splice(index, 1)
-  	fs.writeFileSync("./servers.json", JSON.stringify(servers, null, 2))
+  	fs.writeFileSync(DatabasePath, JSON.stringify(servers, null, 2))
   	res.send("Server removed")
 })
 
@@ -248,7 +248,7 @@ if (!fs.existsSync(DatabasePath)) {
 } else {
   	if (Debugging) {console.log("DEBUG: servers.json already exists.")}
 }
-servers = require("./servers.json")
+servers = require(DatabasePath)
 
 // AutoMode Loop
 setInterval(() => {
