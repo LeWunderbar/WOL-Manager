@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# Default values for variables
+# VARS
 TOKEN=$1
 INSTALL_DIR="/opt/shutdown-server"
 SERVICE_NAME="shutdown-server"
+REPO="https://raw.githubusercontent.com/LeWunderbar/WOL-Manager/shutdown-option/shutdown-files/shutdown-client.js"
 
-# Install Node.js (skip if already installed)
+# Install Node.js
 if ! command -v node > /dev/null; then
   echo "Node.js not found. Installing the latest Node.js version..."
   curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash -
@@ -19,15 +20,13 @@ fi
 # Create installation directory
 sudo mkdir -p $INSTALL_DIR
 sudo chown $USER:$USER $INSTALL_DIR
-
-# Move to installation directory
 cd $INSTALL_DIR
 
-# Fetch the shutdown client code from GitHub
+# Get file from github
 echo "Downloading shutdown-client.js from GitHub..."
-curl -o shutdownServer.js https://raw.githubusercontent.com/LeWunderbar/WOL-Manager/main/shutdown-files/shutdown-client.js
+curl -o shutdownServer.js $REPO
 
-# Write the config file with the token
+# Write the config file
 cat > config.json <<EOL
 {
   "token": "$TOKEN"
@@ -38,9 +37,25 @@ EOL
 npm init -y > /dev/null 2>&1
 npm install express child_process > /dev/null 2>&1
 
+# Stop and disable the existing service if it exists
+if systemctl is-active --quiet $SERVICE_NAME; then
+  echo "Stopping the existing service..."
+  sudo systemctl stop $SERVICE_NAME
+fi
+
+if systemctl is-enabled --quiet $SERVICE_NAME; then
+  echo "Disabling the existing service..."
+  sudo systemctl disable $SERVICE_NAME
+fi
+
+# Remove the existing systemd service file if it exists
+if [ -f /etc/systemd/system/$SERVICE_NAME.service ]; then
+  echo "Removing the existing systemd service..."
+  sudo rm /etc/systemd/system/$SERVICE_NAME.service
+fi
+
 # Setup systemd service
 echo "Setting up systemd service..."
-
 sudo tee /etc/systemd/system/$SERVICE_NAME.service > /dev/null <<EOL
 [Unit]
 Description=Shutdown Server API
