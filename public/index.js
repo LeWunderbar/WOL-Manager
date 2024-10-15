@@ -2,7 +2,7 @@
 
 // VARS //
 const cStatusUpdateInterval = 5 // In Sec
-const cCommand = 'sudo bash -c "curl -fsSL https://raw.githubusercontent.com/LeWunderbar/WOL-Manager/shutdown-option/shutdown-files/WOL-Manager-Shutdown-Client-Installer.sh -o /tmp/install.sh && chmod +x /tmp/install.sh && /tmp/install.sh '
+const cCommand = 'sudo bash -c "curl -fsSL https://raw.githubusercontent.com/LeWunderbar/WOL-Manager/master/shutdown-files/WOL-Manager-Shutdown-Client-Installer.sh -o /tmp/install.sh && chmod +x /tmp/install.sh && /tmp/install.sh '
 
 // FUNCTIONS //
 // Fetch servers and display them
@@ -122,12 +122,13 @@ async function wakeServer(index) {
   try {
 	const response = await fetch(`/api/wake/${index}`, { method: "POST" })
 	if (!response.ok) {
-	  showNotification("Failed to send wake packet.", "error")
+	  	showNotification("Failed to send wake packet.", "error")
+	} else {
+		showNotification("Wake packet sent successfully.", "success")
 	}
-	showNotification("Wake packet sent successfully.", "success")
-  } catch (error) {
-	showNotification("Failed to send wake packet.", "error")
-  }
+  	} catch (error) {
+		showNotification("Failed to send wake packet.", "error")
+  	}
 }
 
 // Toggle Automode API Call
@@ -150,60 +151,60 @@ async function removeServer(index) {
   try {
 	const response = await fetch(`/api/servers/${index}`, { method: "DELETE" })
 	if (!response.ok) {
-	  showNotification("Failed to remove server.", "error")
+	  	showNotification("Failed to remove server.", "error")
 	}
 
 	fetchServers()
 	showNotification("Server removed successfully.", "success")
-  } catch (error) {
-	showNotification("Failed to remove server.", "error")
-  }
+  	} catch (error) {
+		showNotification("Failed to remove server.", "error")
+  	}
 }
 
 // Add New server Handler and API Call
 document.getElementById("new-server-form").addEventListener("submit", async (e) => {
 	try {
-	  e.preventDefault()
-	  const name = document.getElementById("name").value
-	  const ip = document.getElementById("ip").value
-	  const mac = document.getElementById("mac").value
-	  const autoMode = document.getElementById("autoMode").checked
-	  const allowShutdown = document.getElementById("allowShutdown").checked
-	  let token = ""
-  
-	  const response = await fetch('/api/servers')
-	  const servers = await response.json()
-  
-	  const ipExists = servers.some(server => server.ip === ip)
-	  if (ipExists) {
-		showNotification("IP address already in use!", "error")
-		return
-	  }
+		e.preventDefault()
+		const name = document.getElementById("name").value
+		const ip = document.getElementById("ip").value
+		const mac = document.getElementById("mac").value
+		const autoMode = document.getElementById("autoMode").checked
+		const allowShutdown = document.getElementById("allowShutdown").checked
+		let token = ""
+	
+		const response = await fetch('/api/servers')
+		const servers = await response.json()
+	
+		const ipExists = servers.some(server => server.ip === ip)
+		if (ipExists) {
+			showNotification("IP address already in use!", "error")
+			return
+		}
 
-	  if (allowShutdown) {
-		token = generateRandomString(32)
-		const command = cCommand + token + '"'
-		showTokenPopup(command)
-	  }
-  
-	  await fetch("/api/servers", {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ name, ip, mac, autoMode, allowShutdown, token })
-	  })
-  
+		if (allowShutdown) {
+			token = generateRandomString(32)
+			const command = cCommand + token + '"'
+			showTokenPopup(command)
+		}
+	
+		await fetch("/api/servers", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ name, ip, mac, autoMode, allowShutdown, token })
+		})
+	
 
-	  document.getElementById("name").value = ""
-	  document.getElementById("ip").value = ""
-	  document.getElementById("mac").value = ""
-	  document.getElementById("autoMode").checked = false
-	  document.getElementById("allowShutdown").checked = false
-  
-	  fetchServers()
-	  updateServerStatuses()
-	  showNotification("Server added successfully.", "success")
+		document.getElementById("name").value = ""
+		document.getElementById("ip").value = ""
+		document.getElementById("mac").value = ""
+		document.getElementById("autoMode").checked = false
+		document.getElementById("allowShutdown").checked = false
+	
+		fetchServers()
+		updateServerStatuses()
+		showNotification("Server added successfully.", "success")
 	} catch (error) {
-	  showNotification("Failed to add server.", "error")
+	  	showNotification("Failed to add server.", "error")
 	}
 })
 
@@ -213,5 +214,5 @@ updateServerStatuses()
 
 // Update Statuses Loop
 setInterval(() => {
-  updateServerStatuses()
+	updateServerStatuses()
 }, cStatusUpdateInterval * 1000)

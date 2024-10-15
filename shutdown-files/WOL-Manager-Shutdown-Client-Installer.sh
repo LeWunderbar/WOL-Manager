@@ -4,7 +4,7 @@
 TOKEN=$1
 INSTALL_DIR="/opt/shutdown-server"
 SERVICE_NAME="shutdown-server"
-REPO="https://raw.githubusercontent.com/LeWunderbar/WOL-Manager/shutdown-option/shutdown-files/shutdown-client.js"
+REPO="https://raw.githubusercontent.com/LeWunderbar/WOL-Manager/master/shutdown-files/shutdown-client.js"
 
 # Check if a token is provided
 if [ -z "$TOKEN" ]; then

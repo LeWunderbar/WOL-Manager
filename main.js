@@ -7,7 +7,6 @@ const http = require("http")
 const wol = require("wake_on_lan")
 const bodyParser = require("body-parser")
 const ping = require("ping")
-// const { generateKeyPair } = require("./ssh")
 
 // VARS //
 const app = express()
@@ -20,7 +19,7 @@ let WakingServersArray = []
 const cCheckAutoModeInterval = 60 // In Sec
 const cWakingInterval = 60 // In Sec
 const cAppPort = 3000
-const Debugging = true
+const Debugging = false
 
 // Functions //
 // Ping Function
