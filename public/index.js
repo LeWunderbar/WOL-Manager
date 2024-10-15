@@ -2,7 +2,7 @@
 
 // VARS //
 const cStatusUpdateInterval = 5 // In Sec
-const cCommand = "sudo bash -c 'curl -fsSL https://raw.githubusercontent.com/LeWunderbar/WOL-Manager/shutdown-option/shutdown-files/WOL-Manager-Shutdown-Client-Installer.sh -o /tmp/install.sh && chmod +x /tmp/install.sh && /tmp/install.sh' "
+const cCommand = 'sudo bash -c "curl -fsSL https://raw.githubusercontent.com/LeWunderbar/WOL-Manager/shutdown-option/shutdown-files/WOL-Manager-Shutdown-Client-Installer.sh -o /tmp/install.sh && chmod +x /tmp/install.sh && /tmp/install.sh '
 
 // FUNCTIONS //
 // Fetch servers and display them
@@ -166,7 +166,7 @@ document.getElementById("new-server-form").addEventListener("submit", async (e) 
   
 	  if (allowShutdown) {
 		token = generateRandomString(32)
-		const command = cCommand + token + "'"
+		const command = cCommand + token + '"'
 		showTokenPopup(command)
 	  }
   
