@@ -29,6 +29,17 @@
       </label>
       <button type="submit" class="addServerBtn button">Add Server</button>
     </form>
+    
+    <!-- Token Popup -->
+    <div id="token-popup" class="token-popup" style="display: none;">
+      <div class="token-popup-content">
+        <span class="close" onclick="closeTokenPopup()">&times;</span>
+        <h1>Installation Script</h1>
+        <h2 class="install-guide">This is your one-line installation script for setting up a Node.js application on the Linux server you want to manage. Please ensure you run this script with sudo permissions. Note that it is important to keep the script secure, as it includes a token. Additionally, be aware that this setup is insecure because it uses HTTP instead of HTTPS, and tokens ARE stored in cleartext. Use it with caution.</h2>
+        <input type="text" id="token-field" readonly>
+        <button class="button" onclick="copyToken()">Copy Token</button>
+      </div>
+    </div>
   </div>
 </body>
 </html>

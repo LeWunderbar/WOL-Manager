@@ -2,6 +2,7 @@
 
 // VARS //
 const cStatusUpdateInterval = 5 // In Sec
+const cCommand = "sudo bash -c 'curl -fsSL https://raw.githubusercontent.com/LeWunderbar/WOL-Manager/shutdown-option/shutdown-files/WOL-Manager-Shutdown-Client-Installer.sh -o /tmp/install.sh && chmod +x /tmp/install.sh && /tmp/install.sh "
 
 // FUNCTIONS //
 // Fetch servers and display them
@@ -63,8 +64,39 @@ function showNotification(message, type) {
   }, 3000); 
 }
 
-// API FUNCTIONS //
+function generateRandomString(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        result += characters[randomIndex];
+    }
+    return result;
+}
 
+function showTokenPopup(token) {
+	const tokenPopup = document.getElementById('token-popup');
+	const tokenField = document.getElementById('token-field');
+  
+	tokenField.value = token;
+	tokenPopup.style.display = 'block';
+}
+
+// Function to copy token to clipboard
+function copyToken() {
+	const tokenField = document.getElementById('token-field');
+	tokenField.select();
+	tokenField.setSelectionRange(0, 99999);
+	navigator.clipboard.writeText(tokenField.value);
+}
+  
+// Function to close token popup
+function closeTokenPopup() {
+	const tokenPopup = document.getElementById('token-popup');
+	tokenPopup.style.display = 'none';
+}
+
+// API FUNCTIONS //
 // shutdown API Call
 async function shutdownServer(index) {
 	try {
@@ -123,33 +155,40 @@ async function removeServer(index) {
 
 // Add New server Handler and API Call
 document.getElementById('new-server-form').addEventListener('submit', async (e) => {
-  try {
-	e.preventDefault();
-	const name = document.getElementById('name').value;
-	const ip = document.getElementById('ip').value;
-	const mac = document.getElementById('mac').value;
-	const autoMode = document.getElementById('autoMode').checked;
-	const allowShutdown = document.getElementById("allowShutdown").checked;
-
-	await fetch('/api/servers', {
-	  method: 'POST',
-	  headers: { 'Content-Type': 'application/json' },
-	  body: JSON.stringify({ name, ip, mac, autoMode, allowShutdown })
-	});
-
-	// Clear input fields after adding the server
-	document.getElementById('name').value = '';
-	document.getElementById('ip').value = '';
-	document.getElementById('mac').value = '';
-	document.getElementById('autoMode').checked = false;
-	document.getElementById("allowShutdown").checked = false
-
-	fetchServers();
-	updateServerStatuses();
-	showNotification('Server added successfully.', 'success');
-  } catch (error) {
-	showNotification('Failed to remove server.', 'error');
-  }
+	try {
+	  e.preventDefault();
+	  const name = document.getElementById('name').value;
+	  const ip = document.getElementById('ip').value;
+	  const mac = document.getElementById('mac').value;
+	  const autoMode = document.getElementById('autoMode').checked;
+	  const allowShutdown = document.getElementById("allowShutdown").checked;
+	  let token = "";
+  
+	  if (allowShutdown) {
+		token = generateRandomString(32);
+		const command = cCommand + token + "'"
+		showTokenPopup(command);
+	  }
+  
+	  await fetch('/api/servers', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ name, ip, mac, autoMode, allowShutdown, token })
+	  });
+  
+	  // Clear input fields after adding the server
+	  document.getElementById('name').value = '';
+	  document.getElementById('ip').value = '';
+	  document.getElementById('mac').value = '';
+	  document.getElementById('autoMode').checked = false;
+	  document.getElementById("allowShutdown").checked = false;
+  
+	  fetchServers();
+	  updateServerStatuses();
+	  showNotification('Server added successfully.', 'success');
+	} catch (error) {
+	  showNotification('Failed to add server.', 'error');
+	}
 });
 
 // INIT //

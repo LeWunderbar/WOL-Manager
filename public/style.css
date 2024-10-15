@@ -151,6 +151,59 @@ input[type="text"] {
   transform: translateY(-2px);
 }
 
+.token-popup {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.token-popup-content {
+  background-color: #282828;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close {
+  color: #9c0d0d;
+  float: right;
+  font-size: 50px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #750312;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#token-field {
+  background-color: #444;
+  margin-top: 10px;
+  width: 100%;
+  padding: 5px;
+  font-size: 16px;
+  resize: none; /* Prevent manual resizing */
+  overflow: hidden; /* Hide scrollbar */
+  height: auto; /* Allow height to adjust */
+  min-height: 40px; /* Set a minimum height */
+}
+
+.install-guide {
+  font-size: 1.25em;
+}
+
 .status-dot {
   display: inline-block;
   width: 12px;

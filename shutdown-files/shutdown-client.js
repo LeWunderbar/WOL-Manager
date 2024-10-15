@@ -8,32 +8,31 @@ const configPath = './config.json';
 let config;
 
 try {
-  const data = fs.readFileSync(configPath);
-  config = JSON.parse(data);
+	const data = fs.readFileSync(configPath);
+	config = JSON.parse(data);
 } catch (err) {
-  console.error('Error reading config.json:', err);
-  process.exit(1);
+	console.error('Error reading config.json:', err);
+	process.exit(1);
 }
 
 app.use(express.json());
 
 app.post('/shutdown', (req, res) => {
-  const { token } = req.body;
-  if (token !== config.token) {
-    return res.status(403).json({ message: 'Forbidden: Invalid token' });
-  }
+	const { token } = req.body;
+	if (token !== config.token) {
+		return res.status(403).json({ message: 'Forbidden: Invalid token' });
+	}
 
-  exec('shutdown now', (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Error shutting down: ${error}`);
-      return res.status(500).json({ message: 'Failed to shutdown the server' });
-    }
-
-    console.log('Server is shutting down...');
-    res.json({ message: 'Server is shutting down...' });
-  });
+	exec('shutdown now', (error, stdout, stderr) => {
+		if (error) {
+			console.error(`Error shutting down: ${error}`);
+			return res.status(500).json({ message: 'Failed to shutdown the server' });
+		}
+		console.log('Server is shutting down...');
+		res.json({ message: 'Server is shutting down...' });
+  	});
 });
 
 app.listen(port, () => {
-  console.log(`Shutdown server API listening at http://localhost:${port}`);
+	console.log(`Shutdown server API listening at http://localhost:${port}`);
 });
