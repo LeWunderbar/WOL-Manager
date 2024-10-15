@@ -18,8 +18,11 @@ try {
 app.use(express.json());
 
 app.post('/shutdown', (req, res) => {
-	const { token } = req.body;
-	if (token !== config.token) {
+	console.log("internal Token: ", config.token)
+	const { tokenGotten } = req.body;
+	console.log("Request Body: ", req.body)
+	console.log("Token Gotten: ", tokenGotten)
+	if (tokenGotten !== config.token) {
 		return res.status(403).json({ message: 'Forbidden: Invalid token' });
 	}
 
@@ -28,8 +31,8 @@ app.post('/shutdown', (req, res) => {
 			console.error(`Error shutting down: ${error}`);
 			return res.status(500).json({ message: 'Failed to shutdown the server' });
 		}
-		console.log('Server is shutting down...');
 		res.json({ message: 'Server is shutting down...' });
+		console.log('Server is shutting down...');
   	});
 });
 
