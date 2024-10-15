@@ -58,7 +58,6 @@ app.post('/api/shutdown/:index', (req, res) => {
 			}
 		};
 
-		// Create the request
 		const req = http.request(options, (res) => {
 			console.log(`STATUS: ${res.statusCode}`); // DEBUG
 
@@ -68,15 +67,12 @@ app.post('/api/shutdown/:index', (req, res) => {
 			});
 		});
 
-		// Handle errors
 		req.on('error', (error) => {
 			console.error(`Error: ${error.message}`); // DEBUG
+			res.status(500).send('Error on Server');
 		});
 
-		// Write the data to the request body
 		req.write(JSON.stringify({ token: token }));
-
-		// End the request
 		req.end();
 	}
 });

@@ -27,7 +27,7 @@ app.post('/shutdown', (req, res) => {
         return res.status(403).json({ message: 'Forbidden: Invalid token' });
     }
 
-    exec('shutdown now', (error, stdout, stderr) => {
+    exec('/sbin/shutdown now', (error, stdout, stderr) => {
         if (error) {
             console.error(`Error shutting down: ${error}`);
             return res.status(500).json({ message: 'Failed to shutdown the server' });
