@@ -119,30 +119,36 @@ input[type="text"] {
 
 .wake_btn {
   background-color: #1db954;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 20px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  flex-shrink: 0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  margin-top: 10px;
+  width: 125px;
+  text-align: center;
+}
+
+.shutdown_btn {
+  background-color: #9c0d0d;
+  width: 125px;
+  text-align: center;
 }
 
 .remove_btn {
-  background-color: #9c0d0d;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 20px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  flex-shrink: 0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  margin-top: 10px;
+  background-color: #FF851B;
+  width: 125px;
+  text-align: center;
+  color: #181818;
+}
+
+.button:hover {
+  background-color: #097a33;
+  transform: translateY(-2px);
+}
+
+.remove_btn:hover {
+  background-color: #b45705;
+  transform: translateY(-2px);
+}
+
+.shutdown_btn:hover {
+  background-color: #750312;
+  transform: translateY(-2px);
 }
 
 .status-dot {
@@ -154,22 +160,8 @@ input[type="text"] {
   vertical-align: middle;
 }
 
-.button:hover {
-  background-color: #17a34a;
-  transform: translateY(-2px);
-}
-
-.wake_btn:hover {
-  background-color: #17a34a;
-  transform: translateY(-2px);
-}
-
-.remove_btn:hover {
-  background-color: #750312;
-  transform: translateY(-2px);
-}
-
 input[type="checkbox"] {
+  margin-right: 20px;
   appearance: none;
   width: 20px;
   height: 20px;
@@ -195,6 +187,18 @@ input[type="checkbox"]:checked::after {
   border: solid white;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
+}
+
+.checkbox-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.checkbox-group div {
+  display: flex;
+  align-items: center;
 }
 
 label {

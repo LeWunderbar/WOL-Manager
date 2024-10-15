@@ -17,11 +17,17 @@
       <input type="text" id="name" placeholder="Server Name" required>
       <input type="text" id="ip" placeholder="Server IP" required>
       <input type="text" id="mac" placeholder="MAC Address" required>
-      <label>
-        <input type="checkbox" id="autoMode">
-        Auto Mode
+      <label class="checkbox-group">
+        <div>
+          <input type="checkbox" id="autoMode">
+          Auto Mode
+        </div>
+        <div>
+          <input type="checkbox" id="allowShutdown">
+          Allow Shutdown
+        </div>
       </label>
-      <button type="submit" class="button">Add Server</button>
+      <button type="submit" class="addServerBtn button">Add Server</button>
     </form>
   </div>
 </body>
