@@ -22,7 +22,7 @@ Once you have accessed the web GUI, you can perform the following actions:
 
 2. **Add a New Server**: Enter Nickname, IP Address and MAC Address of your network interface, and click add to add an new server.
 
-3. **Wake a Server**: If a server is offline, you can manually wake it by clicking the "Wake" button next to the server's entry
+3. **Wake a Server**: If a server is offline, you can manually wake it by clicking the "Wake" button next to the server"s entry
 
 4. **Toggle Automode**: To enable or disable the automode feature for a specific serve
 
