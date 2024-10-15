@@ -16,9 +16,10 @@ app.use(express.static("public"))
 
 const DatabasePath = "./servers.json"
 let servers = null
-const cCheckAutoModeInterval = 60 // In Sec
-const cWakingInterval = 30 // In Sec
 let WakingServersArray = []
+const cCheckAutoModeInterval = 60 // In Sec
+const cWakingInterval = 60 // In Sec
+const cAppPort = 3000
 const Debugging = true
 
 // Functions //
@@ -44,36 +45,50 @@ app.post("/api/shutdown/:index", (req, res) => {
 	const server = servers[req.params.index]
 	if (Debugging) {console.log("DEBUG: API CALL: POST /api/shutdown with data: ", server)}
 	if (!server.allowShutdown) {
-		res.send("Shutdown not allowed for ", server.name)
+		res.status(401).send("Server is not allowed to be shutdown!")
 	} else {
-		const token = server.token
-		const options = {
-			hostname: server.ip,
-			port: 4021,
-			path: "/shutdown",
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"Content-Length": Buffer.byteLength(JSON.stringify({ token: token }))
+		pingResult = checkServerStatus(server.ip)
+		if (!pingResult) {
+			res.status(503).send("Server not online!")
+		} else {
+			const token = server.token
+			const options = {
+				hostname: server.ip,
+				port: 4021,
+				path: "/shutdown",
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"Content-Length": Buffer.byteLength(JSON.stringify({ token: token }))
+				}
 			}
-		}
 
-		const req = http.request(options, (res) => {
-			if (Debugging) {console.log(`DEBUG: Shutdown request sent. Statuscode: ${res.statusCode}`, )}
-
-			res.setEncoding("utf8")
-			res.on("data", (chunk) => {
-				if (Debugging) {console.log(`DEBUG: Shutdown request sent. Got: ${chunk}`, )}
+			const req = http.request(options, (resShutdown) => {
+				if (Debugging) {console.log(`DEBUG: Shutdown request sent. Statuscode: ${resShutdown.statusCode}`, )}
+				resShutdown.setEncoding("utf8")
+				resShutdown.on("data", (chunk) => {
+					if (Debugging) {console.log(`DEBUG: Shutdown request sent. Got: ${chunk}`, )}
+				})
+				if (resShutdown.statusCode == 200) {
+					res.status(200).send("Shutdown request successfully!")
+				} else if (resShutdown.statusCode == 403) {
+					res.status(403).send("Invalid Token!")
+				} else if (resShutdown.statusCode == 500) {
+					res.status(501).send("Error on server to shutdown")
+				} else {
+					res.status(500).send("Unknowen Statuscode!")
+					if (Debugging) {console.log(`DEBUG: Shutdown request: Unknowen Statuscode Got: ${resShutdown.statusCode}`, )}
+				}
 			})
-		})
 
-		req.on("error", (error) => {
-			console.error(`Error: ${error.message}`)
-			res.status(500).send("Error on Server")
-		})
+			req.on("error", (error) => {
+				console.error(`Error: ${error.message}`)
+				res.status(500).send("Error on Server")
+			})
 
-		req.write(JSON.stringify({ token: token }))
-		req.end()
+			req.write(JSON.stringify({ token: token }))
+			req.end()
+		}
 	}
 })
 
@@ -113,8 +128,8 @@ app.post("/api/wake/:index", (req, res) => {
 
 // API to toggle auto mode
 app.post("/api/toggle/:index", (req, res) => {
-  	if (Debugging) {console.log("DEBUG: API CALL: POST /api/toggle with data: ", index)}
   	servers[req.params.index].autoMode = !servers[req.params.index].autoMode
+	if (Debugging) {console.log("DEBUG: API CALL: POST /api/toggle with data: ", req.params.index)}
   	fs.writeFileSync("./servers.json", JSON.stringify(servers, null, 2))
   	res.send("Auto mode toggled")
 })
@@ -250,6 +265,6 @@ setInterval(() => {
 }, cCheckAutoModeInterval * 1000)
 
 // Start frontend
-app.listen(3000, () => {
-  	console.log("Server running on port 3000")
+app.listen(cAppPort, () => {
+	console.log(`Server running on port ${cAppPort}`)
 })

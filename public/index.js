@@ -100,13 +100,20 @@ function closeTokenPopup() {
 // shutdown API Call
 async function shutdownServer(index) {
 	try {
-	  const response = await fetch(`/api/shutdown/${index}`, { method: "POST" })
-	  if (!response.ok) {
-		showNotification("Failed to send shutdown request.", "error")
-	  }
-	  showNotification("Shutdown request successfully send.", "success")
+		const response = await fetch(`/api/shutdown/${index}`, { method: "POST" })
+	  	if (response.status == 200) {
+			showNotification("Shutdown request successfully send!", "success")
+		} else if (response.status == 403) {
+			showNotification("Invalid Token!", "error")
+		} else if (response.status == 501) {
+			showNotification("Error on the server to shutdown!", "error")
+		} else if (response.status == 503) {
+			showNotification("Server is currently Offline! Cannot shutdown!", "error")
+		} else {
+			showNotification("Internal Server Error", "error")
+		}
 	} catch (error) {
-	  showNotification("Failed to send shutdown request.", "error")
+	  	showNotification("Failed to send shutdown request!", "error")
 	}
 }
 
@@ -164,6 +171,15 @@ document.getElementById("new-server-form").addEventListener("submit", async (e) 
 	  const allowShutdown = document.getElementById("allowShutdown").checked
 	  let token = ""
   
+	  const response = await fetch('/api/servers')
+	  const servers = await response.json()
+  
+	  const ipExists = servers.some(server => server.ip === ip)
+	  if (ipExists) {
+		showNotification("IP address already in use!", "error")
+		return
+	  }
+
 	  if (allowShutdown) {
 		token = generateRandomString(32)
 		const command = cCommand + token + '"'
@@ -176,7 +192,7 @@ document.getElementById("new-server-form").addEventListener("submit", async (e) 
 		body: JSON.stringify({ name, ip, mac, autoMode, allowShutdown, token })
 	  })
   
-	  // Clear input fields after adding the server
+
 	  document.getElementById("name").value = ""
 	  document.getElementById("ip").value = ""
 	  document.getElementById("mac").value = ""
