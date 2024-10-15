@@ -3,7 +3,7 @@
 // MODULES //
 const express = require('express');
 const fs = require('fs');
-const fetch = require('node-fetch');
+const http = require('http');
 const wol = require('wake_on_lan');
 const bodyParser = require('body-parser');
 const ping = require('ping');
@@ -46,7 +46,38 @@ app.post('/api/shutdown/:index', (req, res) => {
 	if (!server.allowShutdown) {
 		res.send("Shutdown not allowed for ", server.name);
 	} else {
+		const token = server.token
+		const options = {
+			hostname: server.ip,
+			port: 4021,
+			path: '/shutdown',
+			method: 'POST',
+			headers: {
+			  'Content-Type': 'text/plain',
+			  'Content-Length': Buffer.byteLength(JSON.stringify({ token }))
+			}
+		  };
 
+		// Create the request
+		const req = http.request(options, (res) => {
+			console.log(`STATUS: ${res.statusCode}`); // DEBUG
+				
+			res.setEncoding('utf8');
+			res.on('data', (chunk) => {
+			console.log(`BODY: ${chunk}`); // DEBUG
+			});
+		});
+			
+		// Handle errors
+		req.on('error', (error) => {
+			console.error(`Error: ${error.message}`); // DEBUG
+		});
+			
+		// Write the data to the request body
+		req.write(JSON.stringify({ token }));
+			
+		// End the request
+		req.end();
 	}
 });
 
