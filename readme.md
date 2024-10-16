@@ -31,3 +31,11 @@ Once you have accessed the web GUI, you can perform the following actions:
 4. **Toggle Automode**: To enable or disable the automode feature for a specific serve
 
 5. **Remove a Server**: To remove a server from the list, click the "Remove" button next to the server.
+
+## Installion via Docker
+
+`docker run -d -v /path/on/host:/usr/src/app/database --name WOL-Manager --cap-add=NET_RAW --network host m23dev/wol-manager:latest`
+
+- Replace `/path/on/host` with your path for the database
+- `--cap-add=NET_RAW` is required for the application to send pings
+- `--network host` is required to send wakeonlan packets
