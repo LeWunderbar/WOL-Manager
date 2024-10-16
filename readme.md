@@ -17,7 +17,7 @@ By selecting this option, the user can install a script on the target server to 
 To access the WOL-Manager web GUI, follow these steps:
 
 1. Ensure that the application is running on your server.
-2. Open a web browser and navigate to `http://localhost:3000`
+2. Open a web browser and navigate to `http://localhost:4464`
 3. You should see the WOL-Manager interface, where you can manage your servers.
 
 ## How to Use the Web GUI
