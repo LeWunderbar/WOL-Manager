@@ -10,6 +10,9 @@ COPY . .
 
 EXPOSE 4464
 
-RUN apt-get update && apt-get upgrade -y && apt-get install -y iputils-ping && apt-get install -y wakeonlan
+RUN apt-get update && apt-get install -y \
+    iputils-ping \
+    wakeonlan && \
+    rm -rf /var/lib/apt/lists/*
 
 CMD ["npm", "start"]
