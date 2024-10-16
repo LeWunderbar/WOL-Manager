@@ -18,7 +18,7 @@ let servers = null
 let WakingServersArray = []
 const cCheckAutoModeInterval = 60 // In Sec
 const cWakingInterval = 60 // In Sec
-const cAppPort = 3000
+const cAppPort = 4464
 const Debugging = false
 
 // Functions //

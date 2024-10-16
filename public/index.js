@@ -77,9 +77,15 @@ function generateRandomString(length) {
 function showTokenPopup(token) {
 	const tokenPopup = document.getElementById("token-popup")
 	const tokenField = document.getElementById("token-field")
-  
+	const copyButton = document.getElementById("copy-token-button")
+
 	tokenField.value = token
 	tokenPopup.style.display = "block"
+
+	if (navigator.clipboard && window.isSecureContext) {
+		copyButton.style.display = "inline-block"
+		copyButton.style.display = "none"
+	}
 }
 
 // Function to copy token to clipboard

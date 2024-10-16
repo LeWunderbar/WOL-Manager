@@ -8,6 +8,8 @@ RUN npm install --production
 
 COPY . .
 
-EXPOSE 3000
+EXPOSE 4464
+
+RUN apt-get update && apt-get upgrade -y && apt-get install -y iputils-ping && apt-get install -y wakeonlan
 
 CMD ["npm", "start"]

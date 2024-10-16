@@ -37,7 +37,7 @@
         <h1>Installation Script</h1>
         <h2 class="install-guide">This is your one-line installation script for setting up a Node.js application on the Linux server you want to manage. Please ensure you run this script with sudo permissions. Note that it is important to keep the script secure, as it includes a token. Additionally, be aware that this setup is insecure because it uses HTTP instead of HTTPS, and tokens ARE stored in cleartext. Use it with caution.</h2>
         <input type="text" id="token-field" readonly>
-        <button class="button" onclick="copyToken()">Copy Token</button>
+        <button class="button" id="copy-token-button" onclick="copyToken()">Copy Command</button>
       </div>
     </div>
   </div>
