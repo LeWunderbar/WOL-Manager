@@ -13,65 +13,65 @@ async function fetchServers() {
 	serverList.innerHTML = '';
   
 	servers.forEach((server, index) => {
-	  const serverDiv = document.createElement('div');
-	  const dotStyle = `width: 10px; height: 10px; border-radius: 50%; background-color: #9c0d0d; display: inline-block; margin-right: 10px; vertical-align: middle;`; // default dot color (offline)
+	  	const serverDiv = document.createElement('div');
+	  	const dotStyle = `width: 10px; height: 10px; border-radius: 50%; background-color: #9c0d0d; display: inline-block; margin-right: 10px; vertical-align: middle;`; // default dot color (offline)
   
-	  serverDiv.innerHTML = `
-		<h3>
-		  <span id="status-dot-${index}" style="${dotStyle}"></span>${server.name} (${server.ip})
-		</h3>
-		<label>
-		<input type="checkbox" ${server.autoMode ? 'checked' : ''} onchange="toggleAutoMode(${index})">
-		Auto Mode
-		</label>
-		<button class="wake_btn button" onclick="wakeServer(${index})">Wake</button>
-		${server.allowShutdown ? `<button class="shutdown_btn button" onclick="shutdownServer(${index})">Shutdown</button>` : ''}
-		<button class="remove_btn button" onclick="removeServer(${index})">Remove</button>
-	  `;
-	  serverList.appendChild(serverDiv);
+	  	serverDiv.innerHTML = `
+			<h3>
+				<span id="status-dot-${index}" style="${dotStyle}"></span>${server.name} (${server.ip})
+			</h3>
+			<label>
+				<input type="checkbox" ${server.autoMode ? 'checked' : ''} onchange="toggleAutoMode(${index})">
+				Auto Mode
+			</label>
+			<button class="wake_btn button" onclick="wakeServer(${index})">Wake</button>
+			${server.allowShutdown ? `<button class="shutdown_btn button" onclick="shutdownServer(${index})">Shutdown</button>` : ''}
+			<button class="remove_btn button" onclick="removeServer(${index})">Remove</button>
+		`;
+	  	serverList.appendChild(serverDiv);
 	});
 }
 
 // Get and update Statuses of servers
 async function updateServerStatuses() {
 	try {
-	  const response = await fetch('/api/status')
-	  const servers = await response.json()
-  
-	  servers.forEach((server, index) => {
-		const dot = document.getElementById(`status-dot-${index}`);
-		const dotColor = server.isOnline ? '#1db954' : '#9c0d0d'; // online is green, offline is red
-		dot.style.backgroundColor = dotColor;
-	  });
+	  	const response = await fetch('/api/status')
+		const servers = await response.json()
+	
+		servers.forEach((server, index) => {
+			const dot = document.getElementById(`status-dot-${index}`);
+			const dotColor = server.isOnline ? '#1db954' : '#9c0d0d'; // online is green, offline is red
+			dot.style.backgroundColor = dotColor;
+		});
 	} catch (error) {
-	  console.error('Failed to fetch server statuses:', error);
+	 	console.error('Failed to fetch server statuses:', error);
 	}
 }
 
 
 // Notification Handler
 function showNotification(message, type) {
-  const notification = document.getElementById("notification")
-  notification.className = `notification ${type}`
-  notification.innerText = message
-  notification.style.display = "block"
-  setTimeout(() => {
-	notification.style.opacity = "0"
+	const notification = document.getElementById("notification")
+	notification.className = `notification ${type}`
+	notification.innerText = message
+	notification.style.display = "block"
 	setTimeout(() => {
-	  notification.style.display = "none"
-	  notification.style.opacity = "1" 
-	}, 500) 
-  }, 3000) 
+		notification.style.opacity = "0"
+		setTimeout(() => {
+		notification.style.display = "none"
+		notification.style.opacity = "1" 
+		}, 500) 
+	}, 3000) 
 }
 
 function generateRandomString(length) {
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-    let result = ""
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length)
-        result += characters[randomIndex]
-    }
-    return result
+	const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	let result = ""
+	for (let i = 0; i < length; i++) {
+		const randomIndex = Math.floor(Math.random() * characters.length)
+		result += characters[randomIndex]
+	}
+	return result
 }
 
 function showTokenPopup(token) {
@@ -125,46 +125,46 @@ async function shutdownServer(index) {
 
 // WakeServer API Call
 async function wakeServer(index) {
-  try {
-	const response = await fetch(`/api/wake/${index}`, { method: "POST" })
-	if (!response.ok) {
-	  	showNotification("Failed to send wake packet.", "error")
-	} else {
-		showNotification("Wake packet sent successfully.", "success")
-	}
-  	} catch (error) {
-		showNotification("Failed to send wake packet.", "error")
+  	try {
+		const response = await fetch(`/api/wake/${index}`, { method: "POST" })
+		if (!response.ok) {
+			showNotification("Failed to send wake packet.", "error")
+		} else {
+			showNotification("Wake packet sent successfully.", "success")
+		}
+		} catch (error) {
+			showNotification("Failed to send wake packet.", "error")
   	}
 }
 
 // Toggle Automode API Call
 async function toggleAutoMode(index) {
-  try {
-	const response = await fetch(`/api/toggle/${index}`, { method: "POST" })
-	if (!response.ok) {
-	  showNotification("Failed to toggle Automode.", "error")
-	}
-	showNotification("Changed Automode successfully.", "success")
+	try {
+		const response = await fetch(`/api/toggle/${index}`, { method: "POST" })
+		if (!response.ok) {
+		showNotification("Failed to toggle Automode.", "error")
+		}
+		showNotification("Changed Automode successfully.", "success")
 
-	fetchServers()
-  } catch (error) {
-	showNotification("Failed to toggle Automode.", "error")
-  }
+		fetchServers()
+	} catch (error) {
+		showNotification("Failed to toggle Automode.", "error")
+	}
 }
 
 // Remove server API Call
 async function removeServer(index) {
-  try {
-	const response = await fetch(`/api/servers/${index}`, { method: "DELETE" })
-	if (!response.ok) {
-	  	showNotification("Failed to remove server.", "error")
-	}
+	try {
+		const response = await fetch(`/api/servers/${index}`, { method: "DELETE" })
+		if (!response.ok) {
+			showNotification("Failed to remove server.", "error")
+		}
 
-	fetchServers()
-	showNotification("Server removed successfully.", "success")
-  	} catch (error) {
-		showNotification("Failed to remove server.", "error")
-  	}
+		fetchServers()
+		showNotification("Server removed successfully.", "success")
+		} catch (error) {
+			showNotification("Failed to remove server.", "error")
+		}
 }
 
 // Add New server Handler and API Call
